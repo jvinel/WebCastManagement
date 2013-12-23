@@ -1,19 +1,36 @@
-<?php $this->extend('/Servers/default'); ?>
+<?php $this->extend('/Settings/default'); ?>
 <?php $this->start('title'); ?>Servers<?php $this->end(); ?>
 <?php $this->start('description'); ?>List<?php $this->end(); ?>
 <?php $this->start('breadcrumb'); ?>
-    <li><?php  echo $this->Html->link( '<i class="fa fa-dashboard"></i> Dashboard', array('controller' => 'dashboard', 'action' => 'index'),array('escape' => false)); ?></li>
+    <li><?php  echo $this->Html->link( '<i class="fa fa-gears"></i> Settings', array('controller' => 'settings', 'action' => 'index'),array('escape' => false)); ?></li>
     <li><?php  echo $this->Html->link( '<i class="fa fa-building-o"></i> Servers', array('controller' => 'servers', 'action' => 'index'),array('escape' => false)); ?></li>
     <li class="active"><i class="fa fa-eye"></i> View</li>
 <?php $this->end(); ?>
     <div class="col-lg-10">
+
         <div class="form-group">
             <label>Name</label>
             <p class="form-control-static"><?php echo h($server['Server']['name']); ?></p>
         </div>
         <div class="form-group">
-            <label>Key</label>
-            <p class="form-control-static"><?php echo h($server['Server']['key']); ?></p>
+            <label>Location</label>
+            <p class="form-control-static"><?php echo h($server['Location']['name']); ?></p>
+        </div>
+        <div class="form-group">
+            <label>Remote Location</label>
+            <p class="form-control-static">
+                    <?php foreach ($server['RemoteLocation'] as $remote) { ?>
+                        <?php echo $remote['name'];  ?>, 
+                    <?php } ?>
+            </p>
+        </div>
+        <div class="form-group">
+            <label>Parent</label>
+            <p class="form-control-static"><?php echo h($server['Parent']['name']); ?></p>
+        </div>
+        <div class="form-group">
+            <label>Url</label>
+            <p class="form-control-static"><?php echo h($server['Server']['url']); ?></p>
         </div>
         <div class="form-group">
             <label>Publishing Points</label>
@@ -31,10 +48,10 @@
                     <tr>
                         <td><?php echo $pp['name']; ?></td>
                         <td>
-                          <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('controller'=>'publishingpoints', 'action' => 'edit', $server['Server']['id'], $pp['id']),array('escape' => false)); ?>
+                          <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('controller'=>'publishingpoints', 'action' => 'editServer', $server['Server']['id'], $pp['id']),array('escape' => false)); ?>
                           &nbsp;&nbsp;<?php echo $this->Form->postLink(
                               '<i class="fa fa-eraser"></i> Delete',
-                              array('controller'=>'publishingpoints', 'action' => 'delete', $server['Server']['id'], $pp['id']),
+                              array('controller'=>'publishingpoints', 'action' => 'deleteServer', $server['Server']['id'], $pp['id']),
                               array('escape' => false, 'confirm' => 'Are you sure?'));
                           ?>
                         </td>
@@ -43,7 +60,7 @@
                     <?php unset($pp); ?>
                     </tbody>
                 </table>
-                <?php  echo $this->Html->link( '<i class="fa fa-plus-circle"></i> Add Publishing Point', array('controller' => 'publishingpoints', 'action' => 'add',$server['Server']['id']),array('escape' => false)); ?>
+                <?php  echo $this->Html->link( '<i class="fa fa-plus-circle"></i> Add Publishing Point', array('controller' => 'publishingpoints', 'action' => 'addServer',$server['Server']['id']),array('escape' => false)); ?>
               </div>
         </div>
     </div>

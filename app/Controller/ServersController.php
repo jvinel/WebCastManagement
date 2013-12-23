@@ -7,6 +7,7 @@
 class ServersController extends AppController {
     public $helpers = array('Html', 'Form', 'Session');
     public $components = array('Session');
+    var $uses = array("Server", "PublishingPoint", "Location");
     
     public function index() {
         $this->set('servers', $this->Server->find('all'));
@@ -24,6 +25,7 @@ class ServersController extends AppController {
         }
         $this->set('server', $server);
         $this->set('publishingPoints', $server["PublishingPoint"]);
+        
     }
     
     public function add() {
@@ -35,6 +37,15 @@ class ServersController extends AppController {
             }
             $this->Session->setFlash(__('Unable to add your server.'));
         }
+        // Get locations
+        $locations = $this->Location->generateTreeList(null, null, null, '- ');
+        $this->set(compact('locations'));
+        // Get remote locations
+        $remoteLocations = $this->Location->generateTreeList(null, null, null, '- ');
+        $this->set(compact('remoteLocations'));
+        // Get parent servers
+        $parents = $this->Server->find('list', array('conditions' => array('Server.deleted' => 0)));
+        $this->set(compact('parents'));
     }
     
     public function edit($id = null) {
@@ -60,17 +71,33 @@ class ServersController extends AppController {
             $this->request->data = $server;
         }
         $this->set('server', $server);
+        
+        // Get locations
+        $locations = $this->Location->generateTreeList(null, null, null, '- ');
+        $this->set(compact('locations'));
+        // Get remote locations
+        $remoteLocations = $this->Location->generateTreeList(null, null, null, '- ');
+        $this->set(compact('remoteLocations'));
+        // Get parent servers
+        $parents = $this->Server->find('list', array('conditions' => array('Server.deleted' => 0, 'Server.id !=' => $id)));
+        $this->set(compact('parents'));
     }
     
     public function delete($id) {
         if ($this->request->is('get')) {
             throw new MethodNotAllowedException();
         }
-
-        if ($this->Server->delete($id)) {
-            $this->Session->setFlash(__('The server with id: %s has been deleted.', h($id)));
-            return $this->redirect(array('action' => 'index'));
+        if (!$id) {
+            throw new NotFoundException(__('Invalid server'));
         }
+        $server = $this->Server->findById($id);
+        if (!$server) {
+            throw new NotFoundException(__('Invalid server'));
+        }
+        $servername=$server["Server"]["name"];
+        $this->Server->delete($id);
+        $this->Session->setFlash(__('The server %s has been deleted.', $servername));
+        return $this->redirect(array('action' => 'index'));
     }
 }
 ?>

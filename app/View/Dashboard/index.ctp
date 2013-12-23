@@ -81,7 +81,7 @@
         <div class="panel-body">
           <div id="splinewrapper"></div>
           <div class="clear"></div>
-          <?php echo $this->HighCharts->render('Spline Chart Live Data'); ?>
+         
         </div>
       </div>
     </div>

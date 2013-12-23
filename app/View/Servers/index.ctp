@@ -1,8 +1,8 @@
-<?php $this->extend('/Servers/default'); ?>
+<?php $this->extend('/Settings/default'); ?>
 <?php $this->start('title'); ?>Servers<?php $this->end(); ?>
 <?php $this->start('description'); ?>List<?php $this->end(); ?>
 <?php $this->start('breadcrumb'); ?>
-    <li><?php  echo $this->Html->link( '<i class="fa fa-dashboard"></i> Dashboard', array('controller' => 'dashboard', 'action' => 'index'),array('escape' => false)); ?></li>
+    <li><?php  echo $this->Html->link( '<i class="fa fa-gears"></i> Settings', array('controller' => 'settings', 'action' => 'index'),array('escape' => false)); ?></li>
     <li class="active"><i class="fa fa-building-o"></i> Servers</li>
 <?php $this->end(); ?>
     <div class="table-responsive">

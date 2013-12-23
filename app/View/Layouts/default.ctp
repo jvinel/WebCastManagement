@@ -33,18 +33,25 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 
                 // Css
 		echo $this->Html->css('bootstrap');
+		echo $this->Html->css('bootstrap-select.min');
                 echo $this->Html->css('sb-admin');
                 echo $this->Html->css('font-awesome');
+                echo $this->Html->css('bootstrap-datetimepicker.min');
 
                 // Js
                 echo $this->Html->script('jquery-1.10.2');
                 echo $this->Html->script('bootstrap');
                 echo $this->Html->script('respond.min');
                 echo $this->Html->script('html5shiv');
+                echo $this->Html->script('bootstrap-select.min');
+                echo $this->Html->script('moment');
+                echo $this->Html->script('bootstrap-datetimepicker.min');
+                
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
 		echo $this->fetch('script');
 	?>
+        
 </head>
 <body>
     <div id="wrapper">

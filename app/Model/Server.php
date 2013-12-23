@@ -11,6 +11,8 @@
  * @author vinel_j
  */
 class Server extends AppModel{
+    public $actsAs = array('Utils.SoftDelete');
+    
     public $validate = array(
         'name' => array(
             'rule' => 'notEmpty'
@@ -18,7 +20,18 @@ class Server extends AppModel{
     );
     
     public $hasMany = array('PublishingPoint');
-    public $belongsTo = 'Site';
+    public $belongsTo = array('Location',
+            'Parent' => array( 
+                        'className'	=> 'Server', 
+                        'foreignKey' => 'parent_id' 
+                )
+            );
+    
+    public $hasAndBelongsToMany = array(
+        'RemoteLocation' => array(
+            'className' => 'Location',
+        )
+    );
 }
 
 ?>

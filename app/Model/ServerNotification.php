@@ -6,21 +6,12 @@
  */
 
 /**
- * Description of Server
+ * Description of ServerNotification
  *
  * @author vinel_j
  */
-class EventLocation extends AppModel{
-    public $belongsTo = array(
-        'Event', 'Location'
-    );
-    
-    public $validate = array(  
-        'audience' => array(  
-            'rule' => 'numeric',  
-            'message' => 'Enter the total audience expected for this location'  
-        )  
-    );  
+class ServerNotification extends AppModel{
+      
 }
 
 ?>

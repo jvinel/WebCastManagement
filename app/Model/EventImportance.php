@@ -10,17 +10,17 @@
  *
  * @author vinel_j
  */
-class PublishingPointSource extends AppModel{
+class EventImportance extends AppModel{
     public $actsAs = array('Utils.List');
-    public $order = "PublishingPointSource.position";
+    public $order = "EventImportance.position";
     public $validate = array(
         'url' => array(
-            'rule' => 'notEmpty'
+            'name' => 'notEmpty'
         )
     );
     
-    public $belongsTo = array(
-    	'PublishingPoint' => array ('foreingKey'=> 'publishing_point_id')
+    public $hasMany = array(
+    	'Event' 
     );
     
 }

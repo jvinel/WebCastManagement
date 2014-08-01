@@ -37,6 +37,7 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
                 echo $this->Html->css('sb-admin');
                 echo $this->Html->css('font-awesome');
                 echo $this->Html->css('bootstrap-datetimepicker.min');
+                echo $this->Html->css('datatables');
 
                 // Js
                 echo $this->Html->script('jquery-1.10.2');
@@ -46,6 +47,8 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
                 echo $this->Html->script('bootstrap-select.min');
                 echo $this->Html->script('moment');
                 echo $this->Html->script('bootstrap-datetimepicker.min');
+                echo $this->Html->script('jquery.dataTables');
+                echo $this->Html->script('datatables');
                 
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
@@ -66,7 +69,7 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="index.html">WebCast Management</a>
+            <a class="navbar-brand" href="/wcm" style="color: #ff9933"><img src="/wcm/img/tarte.png" width="20px"/> WebCast Management</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -88,9 +91,7 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
                 <?php echo $this->fetch('breadcrumb'); ?>
             </ol>
             <?php if(($this->Session->check('Message.flash'))) { ?>
-                <div class="alert alert-info alert-dismissable">
-                    <?php echo $this->Session->flash(); ?>
-                </div>
+                <?php echo $this->Session->flash(); ?>
             <?php } ?>
           </div>
         </div><!-- /.row -->

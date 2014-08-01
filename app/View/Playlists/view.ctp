@@ -1,75 +1,59 @@
 <?php $this->extend('/Settings/default'); ?>
-<?php $this->start('title'); ?>Servers<?php $this->end(); ?>
-<?php $this->start('description'); ?>List<?php $this->end(); ?>
+<?php $this->start('title'); ?>Playlists<?php $this->end(); ?>
+<?php $this->start('description'); ?>View<?php $this->end(); ?>
 <?php $this->start('breadcrumb'); ?>
     <li><?php  echo $this->Html->link( '<i class="fa fa-gears"></i> Settings', array('controller' => 'settings', 'action' => 'index'),array('escape' => false)); ?></li>
-    <li><?php  echo $this->Html->link( '<i class="fa fa-building-o"></i> Servers', array('controller' => 'servers', 'action' => 'index'),array('escape' => false)); ?></li>
+    <li><?php  echo $this->Html->link( '<i class="fa fa-play-circle"></i> Playlists', array('action' => 'index'),array('escape' => false)); ?></li>
     <li class="active"><i class="fa fa-eye"></i> View</li>
 <?php $this->end(); ?>
     <div class="col-lg-10">
 
         <div class="form-group">
             <label>Name</label>
-            <p class="form-control-static"><?php echo h($server['Server']['name']); ?></p>
+            <p class="form-control-static"><?php echo h($playlist['Playlist']['name']); ?></p>
         </div>
         <div class="form-group">
-            <label>Location</label>
-            <p class="form-control-static"><?php echo h($server['Location']['name']); ?></p>
-        </div>
-        <div class="form-group">
-            <label>Remote Location</label>
-            <p class="form-control-static">
-                    <?php foreach ($server['RemoteLocation'] as $remote) { ?>
-                        <?php echo $remote['name'];  ?>, 
-                    <?php } ?>
-            </p>
-        </div>
-        <div class="form-group">
-            <label>Parent</label>
-            <p class="form-control-static"><?php echo h($server['Parent']['name']); ?></p>
-        </div>
-        <div class="form-group">
-            <label>Url</label>
-            <p class="form-control-static"><?php echo h($server['Server']['url']); ?></p>
-        </div>
-        <div class="form-group">
-            <label>Publishing Points</label>
+            <label>Items</label>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover table-striped tablesorter">
                   <thead>
                     <tr>
-                      <th class="header">Name <i class="fa fa-sort"></i></th>
-                      <th class="header">Actions <i class="fa fa-sort"></i></th>
+                      <th class="header">Name </th>
+                      <th class="header">Timeout </th>
+                      <th class="header">Actions </th>
                     </tr>
                   </thead>
                   <tbody>
 
-                    <?php foreach ($publishingPoints as $pp): ?>
+                    <?php foreach ($items as $item): ?>
                     <tr>
-                        <td><?php echo $pp['name']; ?></td>
+                        <td><?php echo $item['url']; ?></td>
+                        <td><?php echo $item['timeout']; ?></td>
                         <td>
-                          <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('controller'=>'publishingpoints', 'action' => 'editServer', $server['Server']['id'], $pp['id']),array('escape' => false)); ?>
+                          <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('controller'=>'playlistitems', 'action' => 'editPlaylist', $playlist['Playlist']['id'], $item['id']),array('escape' => false)); ?>
                           &nbsp;&nbsp;<?php echo $this->Form->postLink(
                               '<i class="fa fa-eraser"></i> Delete',
-                              array('controller'=>'publishingpoints', 'action' => 'deleteServer', $server['Server']['id'], $pp['id']),
+                              array('controller'=>'playlistitems', 'action' => 'deletePlaylist', $playlist['Playlist']['id'], $item['id']),
                               array('escape' => false, 'confirm' => 'Are you sure?'));
                           ?>
+                          &nbsp;&nbsp;<?php echo $this->Html->link('<i class="fa fa-arrow-up"></i> Up', array('controller'=>'playlistitems','action' => 'up', $playlist['Playlist']['id'], $item['id']),array('escape' => false)); ?>
+                          &nbsp;&nbsp;<?php echo $this->Html->link('<i class="fa fa-arrow-down"></i> Down', array('controller'=>'playlistitems','action' => 'down', $playlist['Playlist']['id'], $item['id']),array('escape' => false)); ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>
-                    <?php unset($pp); ?>
+                    <?php unset($item); ?>
                     </tbody>
                 </table>
-                <?php  echo $this->Html->link( '<i class="fa fa-plus-circle"></i> Add Publishing Point', array('controller' => 'publishingpoints', 'action' => 'addServer',$server['Server']['id']),array('escape' => false)); ?>
+                <?php  echo $this->Html->link( '<i class="fa fa-plus-circle"></i> Add Item', array('controller' => 'playlistitems', 'action' => 'addPlaylist',$playlist['Playlist']['id']),array('escape' => false)); ?>
               </div>
         </div>
     </div>
     <div class="col-lg-2">
         
-                <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('action' => 'edit', $server['Server']['id']),array('escape' => false, 'class' => "list-group-item")); ?>
+                <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('action' => 'edit', $playlist['Playlist']['id']),array('escape' => false, 'class' => "list-group-item")); ?>
                 <?php echo $this->Form->postLink(
                           '<i class="fa fa-eraser"></i> Delete',
-                          array('action' => 'delete', $server['Server']['id']),
+                          array('action' => 'delete', $playlist['Playlist']['id']),
                           array('escape' => false, 'confirm' => 'Are you sure?', 'class' => "list-group-item"));
                       ?>
             

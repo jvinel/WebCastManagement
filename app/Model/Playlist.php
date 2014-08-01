@@ -10,17 +10,15 @@
  *
  * @author vinel_j
  */
-class PublishingPointSource extends AppModel{
-    public $actsAs = array('Utils.List');
-    public $order = "PublishingPointSource.position";
+class Playlist extends AppModel{
     public $validate = array(
-        'url' => array(
+        'name' => array(
             'rule' => 'notEmpty'
         )
     );
     
-    public $belongsTo = array(
-    	'PublishingPoint' => array ('foreingKey'=> 'publishing_point_id')
+    public $hasMany = array(
+    	'PlaylistItem' => array ('order' => 'PlaylistItem.position ASC')
     );
     
 }

@@ -22,6 +22,7 @@ class Location extends AppModel{
     public $hasAndBelongsToMany = array(
         'Member' => array(
             'className' => 'Server',
+            'unique'    => "false"
         )
     );
     

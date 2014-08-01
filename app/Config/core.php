@@ -32,7 +32,7 @@
  * In development mode, you need to click the flash message to continue.
  */
 	Configure::write('debug', 2);
-
+        //Configure::write('Cake.logQuery', 2);
 /**
  * Configure the Error handler used to handle errors for your application. By default
  * ErrorHandler::handleError() is used. It will display errors using Debugger, when debug > 0
@@ -375,3 +375,21 @@ Cache::config('_cake_model_', array(
 	'serialize' => ($engine === 'File'),
 	'duration' => $duration
 ));
+
+
+/**
+ * Configuration for WebCast Management
+ */
+Configure::write('PUBLISHING_POINT_DRAFT', 0);
+Configure::write('PUBLISHING_POINT_PUBLISHED', 1);
+Configure::write('PUBLISHING_POINT_CONFIGURED', 2);
+Configure::write('PUBLISHING_POINT_LIVE_OFF', 0);
+Configure::write('PUBLISHING_POINT_LIVE_ON', 1);
+Configure::write('PUBLISHING_POINT_UNKNOWN', 0);
+Configure::write('PUBLISHING_POINT_STOPPED', 1);
+Configure::write('PUBLISHING_POINT_PLAYING', 2);
+Configure::write('PUBLISHING_POINT_ENDED', 3);
+Configure::write('NOTIFICATION_NEW', 1);
+Configure::write('NOTIFICATION_NOTIFIED', 2);
+Configure::write('NOTIFICATION_APPLIED', 3);
+Configure::write('NOTIFICATION_REJECTED', 3);

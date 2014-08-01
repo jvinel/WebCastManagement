@@ -6,7 +6,7 @@
  */
 class SettingsController extends AppController {
     
-    var $uses =  array("Server", "Location", "PublishingPoint");
+    var $uses =  array("Server", "Location", "PublishingPoint", "Playlist");
     
     
     public function index() {
@@ -18,6 +18,9 @@ class SettingsController extends AppController {
         
         $locations_cnt=$this->Location->find('count');
         $this->set('locations_cnt', $locations_cnt);
+        
+        $playlists_cnt=$this->Playlist->find('count');
+        $this->set('playlists_cnt', $playlists_cnt);
     }
     
     

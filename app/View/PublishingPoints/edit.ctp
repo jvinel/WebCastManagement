@@ -10,14 +10,22 @@
 <?php
 echo $this->Form->create('PublishingPoint');
 echo $this->Form->input('id', array('type' => 'hidden'));
+echo $this->Form->input('name', array('type' => 'hidden'));
 ?>
     <div class="col-lg-10">
         <div class="form-group">
-            <?php echo $this->Form->input('name', array("class"=>"form-control")); ?>
+            <label>Name</label>
+            <p class="form-control-static">
+                <?php echo h($publishingPoint["PublishingPoint"]["name"]); ?>
+            </p>
         </div>
         <div class="form-group">
             <?php echo $this->Form->label('server_id'); ?><br/>
             <?php echo $this->Form->input('server_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
+        </div>
+        <div class="form-group">
+            <?php echo $this->Form->label('location_id'); ?><br/>
+            <?php echo $this->Form->input('location_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
         </div>
         <div class="form-group">
             <?php echo $this->Form->input('limit_connected_player', array("class"=>"form-control")); ?>
@@ -28,6 +36,10 @@ echo $this->Form->input('id', array('type' => 'hidden'));
         <div class="form-group">
             <?php echo $this->Form->label('event_id'); ?><br/>
             <?php echo $this->Form->input('event_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
+        </div>
+        <div class="form-group">
+            <?php echo $this->Form->label('playlist_id'); ?><br/>
+            <?php echo $this->Form->input('playlist_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
         </div>
     </div>
     <div class="col-lg-2">

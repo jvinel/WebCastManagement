@@ -1,6 +1,6 @@
 <?php $this->extend('/Settings/default'); ?>
 <?php $this->start('title'); ?>Publishing Points<?php $this->end(); ?>
-<?php $this->start('description'); ?>Edit<?php $this->end(); ?>
+<?php $this->start('description'); ?>View<?php $this->end(); ?>
 <?php $this->start('breadcrumb'); ?>
     <li><?php  echo $this->Html->link( '<i class="fa fa-gears"></i> Settings', array('controller' => 'settings', 'action' => 'index'),array('escape' => false)); ?></li>
     <li><?php  echo $this->Html->link( '<i class="fa fa-video-camera"></i> Publishing Points', array('controller' => 'publishingpoints', 'action' => 'index'),array('escape' => false)); ?></li>
@@ -11,9 +11,15 @@
             <label>Name</label>
             <p class="form-control-static">
                 <?php echo h($publishingPoint['PublishingPoint']['name']); ?>
-                <?php if ($publishingPoint['PublishingPoint']['configuration_status']==0) { ?>
-                    <span class="label label-default">Draft </span>
+                <?php if ($publishingPoint['PublishingPoint']['configuration_status']==Configure::read('PUBLISHING_POINT_DRAFT')) { ?>
+                    <span class="label label-info">Draft </span>
+                <?php } else if ($publishingPoint['PublishingPoint']['configuration_status']==Configure::read('PUBLISHING_POINT_PUBLISHED')) { ?>
+                          <span class="label label-warning">Published </span>
                 <?php } else { ?>
+                    <span class="label label-success">Applied </span>
+                <?php } ?>
+                <?php if ($publishingPoint['PublishingPoint']['live']==Configure::read('PUBLISHING_POINT_LIVE_ON')) { ?>
+                    &nbsp;&nbsp;<span class="label label-danger">Live </span>
                 <?php } ?>
             </p>
             
@@ -21,6 +27,10 @@
         <div class="form-group">
             <label>Server</label>
             <p class="form-control-static"><?php echo h($publishingPoint['Server']['name']); ?></p>
+        </div>
+        <div class="form-group">
+            <label>Location</label>
+            <p class="form-control-static"><?php echo h($publishingPoint['Location']['name']); ?></p>
         </div>
         <div class="form-group">
             <label>Limit connected player</label>
@@ -36,46 +46,24 @@
         </div>
         <div class="form-group">
             <label>Playlist</label>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover table-striped tablesorter">
-                  <thead>
-                    <tr>
-                      <th class="header">Name <i class="fa fa-sort"></i></th>
-                      <th class="header">Timeout <i class="fa fa-sort"></i></th>
-                      <th class="header">Actions <i class="fa fa-sort"></i></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-
-                    <?php foreach ($sources as $source): ?>
-                    <tr>
-                        <td><?php echo $source['url']; ?></td>
-                        <td><?php echo $source['timeout']; ?></td>
-                        <td>
-                          <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('controller'=>'publishingpointsources', 'action' => 'editPublishingPoint', $publishingPoint['PublishingPoint']['id'], $source['id']),array('escape' => false)); ?>
-                          &nbsp;&nbsp;<?php echo $this->Form->postLink(
-                              '<i class="fa fa-eraser"></i> Delete',
-                              array('controller'=>'publishingpointsources', 'action' => 'deletePublishingPoint', $publishingPoint['PublishingPoint']['id'], $source['id']),
-                              array('escape' => false, 'confirm' => 'Are you sure?'));
-                          ?>
-                          &nbsp;&nbsp;<?php echo $this->Form->postLink('<i class="fa fa-arrow-up"></i> Up', array('controller'=>'publishingpointsources','action' => 'up', $publishingPoint['PublishingPoint']['id'], $source['id']),array('escape' => false)); ?>
-                          &nbsp;&nbsp;<?php echo $this->Form->postLink('<i class="fa fa-arrow-down"></i> Down', array('controller'=>'publishingpointsources','action' => 'down', $publishingPoint['PublishingPoint']['id'], $source['id']),array('escape' => false)); ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <?php unset($source); ?>
-                    </tbody>
-                </table>
-                <?php  echo $this->Html->link( '<i class="fa fa-plus-circle"></i> Add Source', array('controller' => 'publishingpointsources', 'action' => 'addPublishingPoint',$publishingPoint['PublishingPoint']['id']),array('escape' => false)); ?>
-              </div>
+            <p class="form-control-static"><?php echo h($publishingPoint['Playlist']['name']); ?></p>
         </div>
     </div>
     <div class="col-lg-2">
+        <?php if ($publishingPoint['PublishingPoint']['live']==Configure::read('PUBLISHING_POINT_LIVE_OFF')) { ?>
                 <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('action' => 'edit', $publishingPoint['PublishingPoint']['id']),array('escape' => false, 'class' => "list-group-item")); ?>
                 <?php echo $this->Form->postLink(
                           '<i class="fa fa-eraser"></i> Delete',
                           array('action' => 'delete', $publishingPoint['PublishingPoint']['id']),
                           array('escape' => false, 'confirm' => 'Are you sure?', 'class' => "list-group-item"));
                       ?>
+        <?php } ?>
+        <?php if ($publishingPoint['PublishingPoint']['live']==Configure::read('PUBLISHING_POINT_DRAFT')) { ?>
+                <?php echo $this->Form->postLink(
+                          '<i class="fa fa-flash"></i> Publish',
+                          array('action' => 'publish', $publishingPoint['PublishingPoint']['id'], 'view'),
+                          array('escape' => false, 'confirm' => 'Are you sure?', 'class' => "list-group-item"));
+                      ?>
+         <?php } ?>
     </div>
     

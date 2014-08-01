@@ -4,216 +4,191 @@
  *
  * @author vinel_j
  */
-class EventsController extends AppController {
-    public $helpers = array('Html', 'Form', 'Session');
-    public $components = array('Session');
-    var $uses = array("Event", "EventLocation","Location");
-    
-    public function index() {
-        $this->set('events', $this->Event->find('all'));
-    }
-    
-    public function view($id = null) {
-        if (!$id) {
-            throw new NotFoundException(__('Invalid event'));
-        }
+class RemoteController extends AppController {
+    public $components = array('RequestHandler');
+    var $uses = array("PublishingPoint", "ServerNotification", "Server", "Event", "Playlist", "MonitoringData", "LiveSession");
 
-        $event = $this->Event->findById($id);
-        
-        if (!$event) {
-            throw new NotFoundException(__('Invalid event'));
+    /**
+     * Get a list of notification for a specified server (by server name)
+     * @param type $server_name
+     * @throws NotFoundException
+     */
+    public function notificationList($server_name=null) {
+        if (!$server_name) {
+            throw new NotFoundException(__('Invalid server name 1'));
         }
-        $this->set('event', $event);
-        // Get locations
-        $locs = $this->Location->find('threaded', array(
-                                        'fields' => array('id', 'parent_id', 'name'),
-                                        'order' => array('lft ASC') // or array('id ASC')
-                                    ));
-        // Get EventLocation
-        $eventlocs = $this->EventLocation->find('all', array(
-                                        'fields' => array('id', 'location_id', 'audience'),
-                                        'conditions' => array('EventLocation.event_id' => $id)
-                                    ));
-        
-        $locations=array();
-        $this->buildEventLocation($locs, &$locations, "", $eventlocs);
-        $this->set(compact('locations'));
-    }
-    
-    public function add() {
-        if ($this->request->is('post')) {
-            $this->Event->create();
-            if ($this->Event->save($this->request->data)) {
-                
-                // Get count of location
-                $eventloc_max=$this->request->data["eventloc_max"];
-                
-                // Iterate through location
-                for ($cpt=0;$cpt<=$eventloc_max;$cpt++) {
-                    
-                    $fullData=array();
-                    $eventLocData=array();
-                    $eventLocData["location_id"]=$this->request->data["eventloc_" . $cpt . "_locationid"];
-                    $eventLocData["audience"]=$this->request->data["eventloc_" . $cpt . "_audience"];
-                    $eventloc_id=$this->request->data["eventloc_" . $cpt . "_id"];
-                    $eventLocation = $this->EventLocation->findById($eventloc_id);
-                    $eventLocData["event_id"]=$this->Event->getLastInsertID();
-                    if (!$eventLocation) {
-                        $this->EventLocation->create();
-                    } else {
-                       $eventLocData["id"]=$eventloc_id;
-                    }
-                    $fullData["EventLocation"]=$eventLocData;
-                    $this->EventLocation->save($fullData);
-                }
-                
-                $this->Session->setFlash(__('Your event has been saved.'));
-                return $this->redirect(array('action' => 'index'));
+        $server=$this->Server->find('first', array('conditions' => array('Server.deleted' => 0, 'Server.name' => $server_name)));
+        if (!$server) {
+            throw new NotFoundException(__('Invalid server name ' . $server_name));
+        } else {
+            $server["Server"]["last_connection"]= date('Y-m-d H:i:s');
+            //print_r($server);
+            $temp2=array();
+            $temp=array();
+            foreach ($server["RemoteLocation"] as $remoteLoc) {
+                $temp[]=$remoteLoc["id"];
             }
-            $this->Session->setFlash(__('Unable to add your event.'));
+            $temp2["RemoteLocation"]=$temp;
+            $server["RemoteLocation"]=$temp2;
+            //unset($server["Parent"]);
+            //print_r($server);
+            $this->Server->save($server);
         }
-        // Get locations
-        $locs = $this->Location->find('threaded', array(
-                                        'fields' => array('id', 'parent_id', 'name'),
-                                        'order' => array('lft ASC') // or array('id ASC')
-                                    ));
-        // Get EventLocation
-        $eventlocs = $this->EventLocation->find('all', array(
-                                        'fields' => array('id', 'location_id', 'audience'),
-                                        'conditions' => array('EventLocation.event_id' => 0)
-                                    ));
         
-        $locations=array();
-        $this->buildEventLocation($locs, &$locations, "", $eventlocs);
-        $this->set(compact('locations'));
-    }
-    
-    public function edit($id = null) {
-        if (!$id) {
-            throw new NotFoundException(__('Invalid event'));
-        }
-
-        $event = $this->Event->findById($id);
-        if (!$event) {
-            throw new NotFoundException(__('Invalid event'));
-        }
-
-        if ($this->request->is(array('post', 'put'))) {
-            $this->Event->id = $id;
-            if ($this->Event->save($this->request->data)) {
-                //print_r($this->request->data);
-                // Get count of location
-                $eventloc_max=$this->request->data["eventloc_max"];
-                
-                // Iterate through location
-                for ($cpt=0;$cpt<=$eventloc_max;$cpt++) {
-                    
-                    $fullData=array();
-                    $eventLocData=array();
-                    $eventLocData["location_id"]=$this->request->data["eventloc_" . $cpt . "_locationid"];
-                    $eventLocData["audience"]=$this->request->data["eventloc_" . $cpt . "_audience"];
-                    $eventloc_id=$this->request->data["eventloc_" . $cpt . "_id"];
-                    $eventLocation = $this->EventLocation->findById($eventloc_id);
-                    $eventLocData["event_id"]=$id;
-                    if (!$eventLocation) {
-                        $this->EventLocation->create();
-                    } else {
-                       $eventLocData["id"]=$eventloc_id;
-                    }
-                    $fullData["EventLocation"]=$eventLocData;
-                    $this->EventLocation->save($fullData);
-                }
-                
-                $this->Session->setFlash(__('Your event has been updated.'));
-                return $this->redirect(array('action' => 'index'));
-            }
-            $this->Session->setFlash(__('Unable to update your event.'));
-        }
-
-        if (!$this->request->data) {
-            $this->request->data = $event;
-        }
-        $this->set('event', $event);
-        // Get locations
-        $locs = $this->Location->find('threaded', array(
-                                        'fields' => array('id', 'parent_id', 'name'),
-                                        'order' => array('lft ASC') // or array('id ASC')
-                                    ));
+        $notifications=$this->ServerNotification->find('all', array('conditions' => array('ServerNotification.status' => array(1,2), 'ServerNotification.server_name' => $server_name)));
+        $this->set('notifications', $notifications);
+        $this->set('_serialize', array('notifications'));
         
-        // Get EventLocation
-        $eventlocs = $this->EventLocation->find('all', array(
-                                        'fields' => array('id', 'location_id', 'audience'),
-                                        'conditions' => array('EventLocation.event_id' => $id)
-                                    ));
-        
-        $locations=array();
-        $this->buildEventLocation($locs, &$locations, "", $eventlocs);
-        $this->set(compact('locations'));
-        
+        //Update notification and set status to 2 (notified)
+        foreach ($notifications as $notification) {
+            $notification["ServerNotification"]["status"]=Configure::read('NOTIFICATION_NOTIFIED');
+            $this->ServerNotification->save($notification);
+        }
     }
     
     /**
-     * Return EventLocation(id, audience) for a specified location (locationid)
-     * will return array("id" =>0,"audience"=>0) with no EventLocation found
-     * @param type $eventlocs Array of EventLocation for current event
-     * @param type $locationid Location to get defined audience
-     * @return array with id, audience (row of EventLocation table for related $locationid)
+     * Retrieve a publishing point by id
+     * @param type $id
+     * @throws NotFoundException
      */
-    private function getAudience($eventlocs, $locationid) {
-        $result=array("id" =>0,"audience"=>0);
-        foreach ($eventlocs as $el) {
-            if ($el["EventLocation"]["location_id"]==$locationid) {
-                $result["id"]=$el["EventLocation"]["id"];
-                $result["audience"]=$el["EventLocation"]["audience"];
-            }
-        }
-        return $result;
-    }
-    
-    /**
-     * Recursively generate a flat array of tree with terminal flag indicate if the current node 
-     * is a terminal node (no children) and with audience associated to the event and location
-     * as defined in EventLocation
-     * @param type $locs Location (tree with threaded find)
-     * @param type $results (flat array)
-     * @param type $prefix (prefix used for recusrive calls)
-     * @param type $eventlocs (array of EventLocation for this event)
-     */
-    private function buildEventLocation($locs, $results, $prefix, $eventlocs) {
-        foreach ($locs as $loc) {
-            $location=array();
-            $location["locationname"]=$prefix . $loc["Location"]["name"];
-            $location["locationid"]=$loc["Location"]["id"];
-            $temp=$this->getAudience($eventlocs,$loc["Location"]["id"]);
-            $location["locationaudience"]=$temp["audience"];
-            $location["locationeventid"]=$temp["id"];
-            $location["terminal"]=1;
-            if (sizeof($loc["children"])>0) {
-                $location["terminal"]=0;
-                $results[]=$location;
-                $this->buildEventLocation($loc["children"], &$results, $prefix . "&nbsp;&nbsp;&nbsp;", $eventlocs);
-            }  else {
-                $results[]=$location;
-            }
-            
-        }
-    }
-    
-    public function delete($id) {
-        if ($this->request->is('get')) {
-            throw new MethodNotAllowedException();
-        }
+    public function publishingPoint($id) {
         if (!$id) {
-            throw new NotFoundException(__('Invalid event'));
+            throw new NotFoundException(__('Invalid publishing point'));
         }
-        $event = $this->Event->findById($id);
+        
+        // Get the publishing point
+        $this->PublishingPoint->recursive=-1;
+        $publishingPoint = $this->PublishingPoint->findById($id);
+        if (!$publishingPoint) {
+            throw new NotFoundException(__('Invalid publishing point'));
+        }
+        // Get the server
+        $this->Server->recursive=-1;
+        $server=$this->Server->findById($publishingPoint['PublishingPoint']['server_id']);
+        if (!$server) {
+            throw new NotFoundException(__('Invalid server for this publishing point'));
+        }
+        // Get the event
+        $this->Event->recursive=-1;
+        $event=$this->Event->findById($publishingPoint['PublishingPoint']['event_id']);
         if (!$event) {
-            throw new NotFoundException(__('Invalid event'));
+            throw new NotFoundException(__('Invalid event for this publishing point'));
         }
-        $eventname=$event["Event"]["name"];
-        $this->Event->delete($id);
-        $this->Session->setFlash(__('The event %s has been deleted.', $eventname));
-        return $this->redirect(array('action' => 'index'));
+        
+        // Create playlist
+        $playlist=array();
+        if ($server["Server"]["source_id"]>0) {
+            // Not a main server
+            if ($publishingPoint['PublishingPoint']['location_id']==$server["Server"]["location_id"]) {
+                // Local publishing point -> playlist is parent server publishing point for the event
+                $parent=$this->Server->findById($server['Server']['source_id']);
+                $playlist=$this->createPlaylist($publishingPoint['PublishingPoint']["name"], "rtsp://" . $parent["Server"]["name"] . "/" . $event["Event"]["short_name"]);
+                $playlist["Playlist"]["name"]=$publishingPoint['PublishingPoint']["name"];
+            } else {
+                // Remote publishing point -> playlist is current server publishing point for the event
+                $playlist=$this->createPlaylist($publishingPoint['PublishingPoint']["name"], "rtsp://" . $server["Server"]["name"] . "/" . $event["Event"]["short_name"]);
+            }
+        } else {
+            // Main server
+            if ($publishingPoint['PublishingPoint']['location_id']==$server["Server"]["location_id"]) {
+                // Local publishing point -> playlist is event playlist
+                $playlist=$this->Playlist->findById($event["Event"]["playlist_id"]);
+                $playlist["Playlist"]["name"]=$publishingPoint['PublishingPoint']["name"];
+                if (!$playlist) {
+                    throw new NotFoundException(__('Invalid playlist for this publishing point\'s event'));
+                }
+            } else {
+                // Remote publishing point -> playlist is current server publishing point for the event
+                $playlist=$this->createPlaylist($publishingPoint['PublishingPoint']["name"],"rtsp://" . $server["Server"]["name"] . "/" . $event["Event"]["short_name"]);
+            }
+        }
+         $result=array_merge($publishingPoint, $playlist);
+         $this->set('result', $result);
+         $this->set('_serialize', array('result'));
+    }
+    
+    private function createPlaylist($event_name, $url) {
+        $data=array();
+        $item=array();
+        $item["url"]=$url;
+        $item["position"]=1;
+        $pl=array();
+        $pl["name"]=$event_name;
+        $data["Playlist"]=$pl;
+        $data["PlaylistItem"]=$item;
+        return $data;
+    }
+    
+    public function updateNotification() {
+        $json = $this->request->input('json_decode');
+        $id=$json->id;
+        if (!$id) {
+            throw new NotFoundException(__('Invalid notification'));
+        }
+        $status=$json->status;
+        if (!$status) {
+            throw new NotFoundException(__('Invalid status'));
+        }
+        $notification=$this->ServerNotification->findById($id);
+        if (!$notification) {
+            throw new NotFoundException(__('Invalid notification'));
+        }
+        
+        if ($notification["ServerNotification"]["status"]!=Configure::read('NOTIFICATION_NOTIFIED')) {
+            throw new NotFoundException(__('Invalid notification (not in a notified state)'));
+        }
+        $notification["ServerNotification"]["status"]=$status;
+        $this->ServerNotification->save($notification);
+        $result=array();
+        $result["result"]="OK";
+        // If Publishing Point -> Need to change publication point status
+        if (($notification["ServerNotification"]["object_type"]=="PublishingPoint") && ($notification["ServerNotification"]["operation"]=="update") && ($notification["ServerNotification"]["status"]==3)) {
+           $publishingPoint=$this->PublishingPoint->findById($notification["ServerNotification"]["object_id"]); 
+           if ($publishingPoint) {
+               if ($publishingPoint["PublishingPoint"]["configuration_status"]==Configure::read('PUBLISHING_POINT_PUBLISHED')) {
+                   $publishingPoint["PublishingPoint"]["configuration_status"]=Configure::read('PUBLISHING_POINT_CONFIGURED');
+                   $this->PublishingPoint->save($publishingPoint);
+               }
+           }
+        }
+        $this->set('result', $result);
+        $this->set('_serialize', array('result'));
+    }
+    
+    public function sendMonitoring() {
+        $json = $this->request->input('json_decode');
+        $server_name=$json->server;
+        $server=$this->Server->find('first', array('conditions' => array('Server.deleted' => 0, 'Server.name' => $server_name)));
+        if (!$server) {
+            throw new NotFoundException(__('Invalid server name ' . $server_name));
+        }
+        
+        $publishing_point_name=$json->publishing_point;
+        $publishingPoint=$this->PublishingPoint->find('first', array('conditions'=> array('PublishingPoint.deleted' => 0, 'PublishingPoint.name' => $publishing_point_name, 'PublishingPoint.server_id' =>$server["Server"]["id"])));
+        if (!$publishingPoint) {
+            throw new NotFoundException(__('Invalid publishing point ' . $publishing_point_name));
+        }
+        $publishingPoint["PublishingPoint"]["concurrentplayer"]=$json->connected_players;
+        $publishingPoint["PublishingPoint"]["bandwidth"]=$json->current_bandwidth;
+        $this->PublishingPoint->save($publishingPoint);
+        
+        $live=$this->LiveSession->find('first', array('conditions' => array('LiveSession.event_id'=> $publishingPoint["PublishingPoint"]["event_id"], 'LiveSession.active' => 1)));
+        if ($live) {
+            $this->MonitoringData->create();
+            $data=array();
+            $temp=array();
+            $temp["publishing_point_id"]=$publishingPoint["PublishingPoint"]["id"];
+            $temp["connected_players"]=$json->connected_players;
+            $temp["current_bandwidth"]=$json->current_bandwidth;
+            $temp["live_session_id"]=$live["LiveSession"]["id"];
+            $data["MonitoringData"]=$temp;
+            $this->MonitoringData->save($data);
+        }
+        
+        $result=array();
+        $result["result"]="OK";
+        $this->set('result', $result);
+        //$this->set('_serialize', array('result'));
     }
 }
 ?>

@@ -43,9 +43,9 @@ class ServersController extends AppController {
         // Get remote locations
         $remoteLocations = $this->Location->generateTreeList(null, null, null, '- ');
         $this->set(compact('remoteLocations'));
-        // Get parent servers
-        $parents = $this->Server->find('list', array('conditions' => array('Server.deleted' => 0)));
-        $this->set(compact('parents'));
+        // Get source servers
+        $sources = $this->Server->find('list', array('conditions' => array('Server.deleted' => 0)));
+        $this->set(compact('sources'));
     }
     
     public function edit($id = null) {
@@ -59,10 +59,12 @@ class ServersController extends AppController {
         }
 
         if ($this->request->is(array('post', 'put'))) {
+            //echo "ICI";
             $this->Server->id = $id;
+            //print_r($this->request->data);
             if ($this->Server->save($this->request->data)) {
                 $this->Session->setFlash(__('Your server has been updated.'));
-                return $this->redirect(array('action' => 'index'));
+                return $this->redirect(array('action' => 'view', $id));
             }
             $this->Session->setFlash(__('Unable to update your server.'));
         }
@@ -78,9 +80,9 @@ class ServersController extends AppController {
         // Get remote locations
         $remoteLocations = $this->Location->generateTreeList(null, null, null, '- ');
         $this->set(compact('remoteLocations'));
-        // Get parent servers
-        $parents = $this->Server->find('list', array('conditions' => array('Server.deleted' => 0, 'Server.id !=' => $id)));
-        $this->set(compact('parents'));
+        // Get source servers
+        $sources = $this->Server->find('list', array('conditions' => array('Server.deleted' => 0, 'Server.id !=' => $id)));
+        $this->set(compact('sources'));
     }
     
     public function delete($id) {

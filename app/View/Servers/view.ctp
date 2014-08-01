@@ -25,12 +25,16 @@
             </p>
         </div>
         <div class="form-group">
-            <label>Parent</label>
-            <p class="form-control-static"><?php echo h($server['Parent']['name']); ?></p>
+            <label>Source</label>
+            <p class="form-control-static"><?php echo h($server['Source']['name']); ?></p>
         </div>
         <div class="form-group">
             <label>Url</label>
             <p class="form-control-static"><?php echo h($server['Server']['url']); ?></p>
+        </div>
+        <div class="form-group">
+            <label>Bandwidth (kbps)</label>
+            <p class="form-control-static"><?php echo h($server['Server']['bandwidth']); ?></p>
         </div>
         <div class="form-group">
             <label>Publishing Points</label>
@@ -46,14 +50,27 @@
 
                     <?php foreach ($publishingPoints as $pp): ?>
                     <tr>
-                        <td><?php echo $pp['name']; ?></td>
+                        <td><?php echo $pp['name']; ?>
+                            <?php if ($pp['configuration_status']==Configure::read('PUBLISHING_POINT_DRAFT')) { ?>
+                                  <span class="label label-info">Draft </span>&nbsp;&nbsp;
+                              <?php } else if ($pp['configuration_status']==Configure::read('PUBLISHING_POINT_PUBLISHED')) { ?>
+                                  <span class="label label-warning">Published </span>&nbsp;&nbsp;
+                              <?php } else { ?>
+                                  <span class="label label-success">Applied </span>&nbsp;&nbsp;
+                              <?php } ?>
+                              <?php if ($pp['live']==Configure::read('PUBLISHING_POINT_LIVE_ON')) { ?>
+                                  <span class="label label-danger">Live </span>
+                              <?php } ?>
+                        </td>
                         <td>
-                          <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('controller'=>'publishingpoints', 'action' => 'editServer', $server['Server']['id'], $pp['id']),array('escape' => false)); ?>
-                          &nbsp;&nbsp;<?php echo $this->Form->postLink(
-                              '<i class="fa fa-eraser"></i> Delete',
-                              array('controller'=>'publishingpoints', 'action' => 'deleteServer', $server['Server']['id'], $pp['id']),
-                              array('escape' => false, 'confirm' => 'Are you sure?'));
-                          ?>
+                            <?php if ($pp['live']==Configure::read('PUBLISHING_POINT_LIVE_OFF')) { ?>
+                                <?php echo $this->Html->link('<i class="fa fa-pencil"></i> Edit', array('controller'=>'publishingpoints', 'action' => 'editServer', $server['Server']['id'], $pp['id']),array('escape' => false)); ?>
+                                &nbsp;&nbsp;<?php echo $this->Form->postLink(
+                                    '<i class="fa fa-eraser"></i> Delete',
+                                    array('controller'=>'publishingpoints', 'action' => 'deleteServer', $server['Server']['id'], $pp['id']),
+                                    array('escape' => false, 'confirm' => 'Are you sure?'));
+                                ?>
+                            <?php } ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>

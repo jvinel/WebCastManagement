@@ -14,6 +14,10 @@
             <?php echo $this->Form->input('name', array("class"=>"form-control")); ?>
         </div>
         <div class="form-group">
+            <?php echo $this->Form->label('location_id'); ?><br/>
+            <?php echo $this->Form->input('location_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
+        </div>
+        <div class="form-group">
             <?php echo $this->Form->input('limit_connected_player', array("class"=>"form-control")); ?>
         </div>
         <div class="form-group">
@@ -22,6 +26,10 @@
         <div class="form-group">
             <?php echo $this->Form->label('event_id'); ?><br/>
             <?php echo $this->Form->input('event_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
+        </div>
+        <div class="form-group">
+            <?php echo $this->Form->label('playlist_id'); ?><br/>
+            <?php echo $this->Form->input('playlist_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
         </div>
     </div>
     <div class="col-lg-2">

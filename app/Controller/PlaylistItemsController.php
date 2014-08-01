@@ -4,111 +4,116 @@
  *
  * @author vinel_j
  */
-class PublishingPointSourcesController extends AppController {
+class PlaylistItemsController extends AppController {
     public $helpers = array('Html', 'Form', 'Session');
     public $components = array('Session');
-    var $uses = array("PublishingPointSource", "PublishingPoint", "Server");
+    var $uses = array("PlaylistItem", "Playlist", "Server");
+    
     
     /**
-     * Add a publishing point source to a publishing point 
-     * (redirect to publishing point page)
-     * @param type $publishingPoint_id
+     * Add a playlist item to a playlist 
+     * (redirect to playlist page)
+     * @param type $playlist_id
      * @return type
      * @throws NotFoundException
      */
-    public function addPublishingPoint($publishingPoint_id=null) {
-        if (!$publishingPoint_id) {
-            throw new NotFoundException(__('Invalid publishing point'));
+    public function addPlaylist($playlist_id=null) {
+        if (!$playlist_id) {
+            throw new NotFoundException(__('Invalid playlist'));
         }
         if ($this->request->is('post')) {
-            $this->PublishingPointSource->create();
-            if ($this->PublishingPointSource->save($this->request->data)) {
-                $this->Session->setFlash(__('Your source has been saved.'));
-                return $this->redirect(array('controller' => 'publishingpoints', 'action' => 'view', $publishingPoint_id));
+            $this->PlaylistItem->create();
+            if ($this->PlaylistItem->save($this->request->data)) {
+                
+                $this->Session->setFlash(__('Your item has been saved.'));
+                return $this->redirect(array('controller' => 'playlists', 'action' => 'view', $playlist_id));
             }
             $this->Session->setFlash(__('Unable to add your source.'));
         }
-        $this->set('publishingPoint_id', $publishingPoint_id);
-        
+        $this->set('playlist_id', $playlist_id);
     }
     
     /**
-     * Edit a publishing point source from a publishing point page (redirect to publishing point)
-     * @param type $publishingPoint_id
+     * Edit a playlist item from a playlist page (redirect to playlist)
+     * @param type $playlist_id
      * @param type $id
      * @return type
      * @throws NotFoundException
      */
-    public function editPublishingPoint($publishingPoint_id=null,$id = null) {
+    public function editPlaylist($playlist_id=null,$id = null) {
         if (!$id) {
             throw new NotFoundException(__('Invalid source'));
         }
-        if (!$publishingPoint_id) {
-            throw new NotFoundException(__('Invalid publishing point'));
+        if (!$playlist_id) {
+            throw new NotFoundException(__('Invalid playlist'));
         }
-        $ppSource = $this->PublishingPointSource->findById($id);
-        if (!$ppSource) {
+        $item = $this->PlaylistItem->findById($id);
+        if (!$item) {
             throw new NotFoundException(__('Invalid source'));
         }
 
         if ($this->request->is(array('post', 'put'))) {
-            $this->PublishingPointSource->id = $id;
-            if ($this->PublishingPointSource->save($this->request->data)) {
-                $this->Session->setFlash(__('Your source has been updated.'));
-                return $this->redirect(array('controller' => 'publishingpoints', 'action' => 'view', $publishingPoint_id));
+            $this->PlaylistItem->id = $id;
+            if ($this->PlaylistItem->save($this->request->data)) {
+                $point=$this->Playlist->findById($playlist_id);
+                $point["Playlist"]["configuration_status"]=0;
+                $this->Playlist->save($point);
+                $this->Session->setFlash(__('Your item has been updated.'));
+                return $this->redirect(array('controller' => 'playlists', 'action' => 'view', $playlist_id));
             }
             $this->Session->setFlash(__('Unable to update your source.'));
         }
 
         if (!$this->request->data) {
-            $this->request->data = $ppSource;
+            $this->request->data = $item;
         }
-        $this->set('ppSource', $ppSource);
+        $this->set('item', $item);
         
     }
     
     
     /**
-     * Delete a publishing point source from the publishing point page 
-     * (redirect to publishing point)
-     * @param type $publishingPoint_id
+     * Delete a playlist source from the playlist page 
+     * (redirect to playlist)
+     * @param type $playlist_id
      * @param type $id
      * @return type
      * @throws MethodNotAllowedException
      * @throws NotFoundException
      */
-    public function deletePublishingPoint($publishingPoint_id, $id) {
+    public function deletePlaylist($playlist_id, $id) {
         if ($this->request->is('get')) {
             throw new MethodNotAllowedException();
         }
-        $pp = $this->PublishingPointSource->findById($id);
+        $pp = $this->PlaylistItem->findById($id);
         if (!$pp) {
-            throw new NotFoundException(__('Invalid Publishing Point'));
+            throw new NotFoundException(__('Invalid Playlist Item'));
         }
-        $ppname=$pp["PublishingPointSource"]["url"];
-        $this->PublishingPointSource->delete($id);
-        $this->Session->setFlash(__('The source %s has been deleted.', h($ppname)));
-        return $this->redirect(array('controller' => 'publishingpoints', 'action' => 'view', $publishingPoint_id));
+        $ppname=$pp["PlaylistItem"]["url"];
+        $this->PlaylistItem->delete($id);
+        $this->Session->setFlash(__('The item %s has been deleted.', h($ppname)));
+        return $this->redirect(array('controller' => 'playlists', 'action' => 'view', $playlist_id));
     }
     
-    public function up($publishingPoint_id, $id) {
+    public function up($playlist_id, $id) {
         
-        $pp = $this->PublishingPointSource->findById($id);
+        $pp = $this->PlaylistItem->findById($id);
         if (!$pp) {
-            throw new NotFoundException(__('Invalid Publishing Point'));
+            throw new NotFoundException(__('Invalid Item'));
         }
-        $this->PublishingPointSource->moveUp($pp, $id);
-        return $this->redirect(array('controller' => 'publishingpoints', 'action' => 'view', $publishingPoint_id));
+        $this->PlaylistItem->moveUp($pp, $id);
+        
+        return $this->redirect(array('controller' => 'playlists', 'action' => 'view', $playlist_id));
     }
     
-    public function down($publishingPoint_id, $id) {
+    public function down($playlist_id, $id) {
         
-        $pp = $this->PublishingPointSource->findById($id);
+        $pp = $this->PlaylistItem->findById($id);
         if (!$pp) {
-            throw new NotFoundException(__('Invalid Publishing Point'));
+            throw new NotFoundException(__('Invalid Item'));
         }
-        $this->PublishingPointSource->moveDown($pp, $id);
-        return $this->redirect(array('controller' => 'publishingpoints', 'action' => 'view', $publishingPoint_id));
+        $this->PlaylistItem->moveDown($pp, $id);
+        return $this->redirect(array('controller' => 'playlists', 'action' => 'view', $playlist_id));
     }
    
 }

@@ -22,8 +22,14 @@ echo $this->Form->create('Server');
             <?php echo $this->Form->input('RemoteLocation', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
         </div>
         <div class="form-group">
-            <?php echo $this->Form->label('Parent'); ?><br/>
-            <?php echo $this->Form->input('Parent', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
+            <?php echo $this->Form->label('Source'); ?><br/>
+            <?php echo $this->Form->input('Source', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
+        </div>
+        <div class="form-group">
+            <?php echo $this->Form->input('url', array("class"=>"form-control")); ?>
+        </div>
+        <div class="form-group">
+            <?php echo $this->Form->input('bandwidth', array('label'=>"Bandwidth (kbps)", "class"=>"form-control")); ?>
         </div>
     </div>
     <div class="col-lg-2">

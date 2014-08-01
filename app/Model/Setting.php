@@ -6,32 +6,12 @@
  */
 
 /**
- * Description of Server
+ * Description of Setting
  *
  * @author vinel_j
  */
-class Server extends AppModel{
-    public $actsAs = array('Utils.SoftDelete');
+class Setting extends AppModel{
     
-    public $validate = array(
-        'name' => array(
-            'rule' => 'notEmpty'
-        )
-    );
-    
-    public $hasMany = array('PublishingPoint');
-    public $belongsTo = array('Location',
-            'Parent' => array( 
-                        'className'	=> 'Server', 
-                        'foreignKey' => 'parent_id' 
-                )
-            );
-    
-    public $hasAndBelongsToMany = array(
-        'RemoteLocation' => array(
-            'className' => 'Location',
-        )
-    );
 }
 
 ?>

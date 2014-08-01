@@ -11,7 +11,7 @@
  * @author vinel_j
  */
 class MonitoringData extends AppModel{
-    public $belongsTo = 'PublishingPoint';
+    public $belongsTo = array('PublishingPoint', 'LiveSession');
 }
 
 ?>

@@ -1,6 +1,6 @@
 <?php $this->extend('/Settings/default'); ?>
 <?php $this->start('title'); ?>Servers<?php $this->end(); ?>
-<?php $this->start('description'); ?>List<?php $this->end(); ?>
+<?php $this->start('description'); ?>Edit<?php $this->end(); ?>
 <?php $this->start('breadcrumb'); ?>
     <li><?php  echo $this->Html->link( '<i class="fa fa-gears"></i> Settings', array('controller' => 'settings', 'action' => 'index'),array('escape' => false)); ?></li>
     <li><?php  echo $this->Html->link( '<i class="fa fa-building-o"></i> Servers', array('controller' => 'servers', 'action' => 'index'),array('escape' => false)); ?></li>
@@ -24,11 +24,14 @@ echo $this->Form->input('id', array('type' => 'hidden'));
             <?php echo $this->Form->input('RemoteLocation', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
         </div>
         <div class="form-group">
-            <?php echo $this->Form->label('parent_id'); ?><br/>
-            <?php echo $this->Form->input('parent_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
+            <?php echo $this->Form->label('source_id'); ?><br/>
+            <?php echo $this->Form->input('source_id', array('label'=>false, 'empty' => true, "class" => "selectpicker")); ?>
         </div>
         <div class="form-group">
             <?php echo $this->Form->input('url', array("class"=>"form-control")); ?>
+        </div>
+        <div class="form-group">
+            <?php echo $this->Form->input('bandwidth', array('label'=>"Bandwidth (kbps)", "class"=>"form-control")); ?>
         </div>
     </div>
     <div class="col-lg-2">
